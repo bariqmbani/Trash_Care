@@ -6,24 +6,36 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.unpad.trashcare.models.LokasiWarga;
+
+import java.util.ArrayList;
 
 import static com.unpad.trashcare.util.Constants.MAPVIEW_BUNDLE_KEY;
 
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
+    private final String TAG = "MapActivity";
+
+    private ArrayList<LokasiWarga> mLokasiWarga = new ArrayList<>();
+
     private MapView mMapView;
     private GoogleMap mGoogleMap;
     private LatLngBounds mMapBoundary;
     private LokasiWarga mUserPosition;
+    private FusedLocationProviderClient mFusedLocationClient;
 
     FirebaseFirestore db;
+    FirebaseAuth mAuth;
+    FirebaseUser user = mAuth.getCurrentUser();
     String id;
 
     @Override
@@ -35,11 +47,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         db = FirebaseFirestore.getInstance();
 
         initGoogleMap(savedInstanceState);
+//        setUserPosition();
     }
 
 
     /*private void setCameraView() {
 
+//        setUserPosition();
 
         // Set a boundary to start
         double bottomBoundary = mUserPosition.getGeo_point().getLatitude() - .1;
@@ -53,12 +67,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         );
 
         mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(mMapBoundary, 0));
-    }*/
+    }
 
-    /*private void setUserPosition() {
-        for (UserLocation userLocation : mUserLocations) {
-            if (userLocation.getUser().getUser_id().equals(FirebaseAuth.getInstance().getUid())) {
-                mUserPosition = userLocation;
+    private void setUserPosition() {
+        for (LokasiWarga lokasiWarga : mLokasiWarga) {
+            if (user.equals(mAuth.getInstance().getUid())){
+                mUserPosition = lokasiWarga;
             }
         }
     }*/

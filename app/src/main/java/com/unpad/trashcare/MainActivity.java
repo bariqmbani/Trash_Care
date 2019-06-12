@@ -35,9 +35,13 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 import com.unpad.trashcare.models.LokasiWarga;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.unpad.trashcare.util.Constants.ERROR_DIALOG_REQUEST;
 import static com.unpad.trashcare.util.Constants.PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION;
@@ -103,9 +107,11 @@ public class MainActivity extends AppCompatActivity
         btnAngkutSampah.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(MainActivity.this, MapActivity.class);
-                i.putExtra("ID",id);
-                startActivity(i);
+                /*Intent i = new Intent(MainActivity.this, MapActivity.class);
+                startActivity(i);*/
+                Warga warga = ((UserClient)(getApplicationContext())).getWarga();
+                sendNotification(warga);
+                Toast.makeText(MainActivity.this, "Tunggu", Toast.LENGTH_SHORT).show();
                 getUserDetails();
 
             }
@@ -164,9 +170,6 @@ public class MainActivity extends AppCompatActivity
         if (mLokasiWarga == null) {
             mLokasiWarga = new LokasiWarga();
 
-            //DocumentReference userRef = db.collection("Lokasi Warga").document(FirebaseDatabase.getInstance().getReference().child("warga").toString());
-
-            //DocumentReference wargaRef = db.collection("warga").get();
             DocumentReference userRef = db.collection("warga").document(id);
 
             userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -177,8 +180,8 @@ public class MainActivity extends AppCompatActivity
 
                         Warga warga = task.getResult().toObject(Warga.class);
                         mLokasiWarga.setWarga(warga);
+                        ((UserClient)(getApplicationContext())).setWarga(warga);
                         getLastKnownLocation();
-//                        db.collection("Lokasi Warga").document(id).collection("Data Warga").document(id).set(warga);
                     }
                 }
             });
@@ -216,9 +219,6 @@ public class MainActivity extends AppCompatActivity
     private void saveUserLocation() {
 
         if (mLokasiWarga != null) {
-            //DocumentReference locationRef = db.collection("Lokasi Warga").document(FirebaseDatabase.getInstance().getReference().child("warga").toString());
-
-            //DocumentReference wargaRef = db.collection("warga").get();
 
             DocumentReference locationRef = db.collection("Lokasi Warga").document(id);
 
@@ -232,6 +232,17 @@ public class MainActivity extends AppCompatActivity
             });
         }
 
+    }
+
+    private void sendNotification(Warga warga) {
+        String nama = warga.getNama();
+        String alamat = warga.getAlamat();
+        Map<String,Object> notification = new HashMap<>();
+        notification.put("nama", nama);
+        notification.put("alamat", alamat);
+        notification.put("waktu", FieldValue.serverTimestamp());
+
+        db.collection("pemberitahuan").document().set(notification);
     }
 
 
@@ -281,6 +292,7 @@ public class MainActivity extends AppCompatActivity
             mLocationPermissionGranted = true;
             //onNavigationItemSelected(item);
             //onResume();
+            getUserDetails();
             return;
         } else {
             ActivityCompat.requestPermissions(this,

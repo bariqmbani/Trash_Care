@@ -52,6 +52,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "243803007086-9bbsvu5hio5udbrkbhjkmcv03o9so0ub.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.unpad.trashcare",
+            "certificate_hash": "43e230a17d04037e7747cdb61d83915312042d8b"
+          }
+        },
+        {
           "client_id": "243803007086-uobjops0mb5u67kno1g76kk7hti5s776.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -109,6 +117,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "243803007086-t9ampjcvofldi0q2pfq0iihj1p441v03.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.unpad.trashcarepetugas",
+            "certificate_hash": "43e230a17d04037e7747cdb61d83915312042d8b"
+          }
+        },
         {
           "client_id": "243803007086-uobjops0mb5u67kno1g76kk7hti5s776.apps.googleusercontent.com",
           "client_type": 3
