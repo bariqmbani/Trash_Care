@@ -7,7 +7,6 @@ import android.support.v7.widget.Toolbar;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -47,11 +46,12 @@ public class ProfileActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        idUser = getSharedPreferences("id", MODE_PRIVATE).getString("userId", "0");
+        Warga warga = ((UserClient)(getApplicationContext())).getWarga();
+        idUser = warga.getId_warga();
         dispNama = findViewById(R.id.tvNama);
         dispAlamat = findViewById(R.id.tvAlamat);
         dispPhone = findViewById(R.id.noTelp);
-        dispEmail = findViewById(R.id.tvEmail);
+//        dispEmail = findViewById(R.id.tvEmail);
 
         DocumentReference docRef = db.collection(COLLECTION_NAME_KEY).document(idUser);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -70,36 +70,15 @@ public class ProfileActivity extends AppCompatActivity {
                     dispNama.setText(fields1.toString());
                     dispAlamat.setText(fields2.toString());
                     dispPhone.setText(fields3.toString());
-                    dispEmail.setText(fields4.toString());
-                }
-            }
-        })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                    }
-                });
-
-     /*    DocumentReference docRef = db.collection("warga").document("SF");
-       docRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            Log.d(TAG, document.getId() + " => " + document.getData());
-                        }
-                    } else {
-                        Log.w(TAG, "Error getting documents.", task.getException());
-                    }
+//                    dispEmail.setText(fields4.toString());
                 }
             }
         });
     }
+
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
-    }*/
     }
 }
