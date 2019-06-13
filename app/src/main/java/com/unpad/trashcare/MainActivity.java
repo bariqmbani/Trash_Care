@@ -33,6 +33,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -109,8 +110,7 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View v) {
                 /*Intent i = new Intent(MainActivity.this, MapActivity.class);
                 startActivity(i);*/
-                Warga warga = ((UserClient)(getApplicationContext())).getWarga();
-                sendNotification(warga);
+                requestConfirmation();
                 Toast.makeText(MainActivity.this, "Tunggu", Toast.LENGTH_SHORT).show();
                 getUserDetails();
 
@@ -132,18 +132,14 @@ public class MainActivity extends AppCompatActivity
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "Log Out", Toast.LENGTH_SHORT).show();
-                Intent out = new Intent(MainActivity.this, LoginActivity.class);
-                startActivity(out);
+                logOut();
             }
         });
 
         imgLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "Log Out", Toast.LENGTH_SHORT).show();
-                Intent out = new Intent(MainActivity.this, LoginActivity.class);
-                startActivity(out);
+                logOut();
             }
         });
 
@@ -205,9 +201,6 @@ public class MainActivity extends AppCompatActivity
                     Location location = task.getResult();
                     GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
 
-                    //Log.d(TAG, "onComplete: latitude: " + GeoPoint.getLatitude());
-                    //Log.d(TAG, "onComplete: longitude: " + GeoPoint.getLongitude());
-
                     mLokasiWarga.setGeo_point(geoPoint);
                     mLokasiWarga.setTimestamp(null);
                     saveUserLocation();
@@ -245,6 +238,28 @@ public class MainActivity extends AppCompatActivity
         db.collection("pemberitahuan").document().set(notification);
     }
 
+    private void requestConfirmation() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Apakah Anda ingin mengangkut sampah sekarang? ")
+                .setCancelable(true)
+                .setPositiveButton("Ya", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Warga warga = ((UserClient)(getApplicationContext())).getWarga();
+                        sendNotification(warga);
+                        dialogInterface.dismiss();
+                    }
+                })
+                .setNegativeButton("Tidak", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                });
+        AlertDialog confirmAlert = builder.create();
+        confirmAlert.show();
+    }
+
 
     //location permission
     private boolean checkMapServices(){
@@ -258,9 +273,9 @@ public class MainActivity extends AppCompatActivity
 
     private void buildAlertMessageNoGps() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("This application requires GPS to work properly, do you want to enable it?")
+        builder.setMessage("Aplikasi TrashCare membutuhkan GPS agar bisa bekerja dengan baik. Ingin mengaktifkan GPS pada device Anda?")
                 .setCancelable(false)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                .setPositiveButton("Ya", new DialogInterface.OnClickListener() {
                     public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
                         Intent enableGpsIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                         startActivityForResult(enableGpsIntent, PERMISSIONS_REQUEST_ENABLE_GPS);
@@ -281,17 +296,12 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void getLocationPermission() {
-        /*
-         * Request location permission, so that we can get the location of the
-         * device. The result of the permission request is handled by a callback,
-         * onRequestPermissionsResult.
-         */
+
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mLocationPermissionGranted = true;
-            //onNavigationItemSelected(item);
-            //onResume();
+;
             getUserDetails();
             return;
         } else {
@@ -355,6 +365,14 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
+    }
+
+    private void logOut() {
+        Toast.makeText(MainActivity.this, "Log Out", Toast.LENGTH_SHORT).show();
+        FirebaseAuth.getInstance().signOut();
+        Intent out = new Intent(MainActivity.this, LoginActivity.class);
+        startActivity(out);
+        finish();
     }
 
 }
