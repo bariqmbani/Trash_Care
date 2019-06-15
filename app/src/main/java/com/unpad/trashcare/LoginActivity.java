@@ -23,6 +23,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
+import com.unpad.trashcare.models.Warga;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -112,7 +113,7 @@ public class LoginActivity extends AppCompatActivity {
 
                         Map<String, Object> userId = new HashMap<>();
                         userId.put("uid", mAuth.getInstance().getUid());
-                        userId.put("id warga", etUsername.getText().toString());
+                        userId.put("id_warga", etUsername.getText().toString());
 
                         db.collection("Token Warga").document(token).set(userId).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override

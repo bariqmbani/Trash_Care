@@ -2,7 +2,6 @@ package com.unpad.trashcare.models;
 
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.ServerTimestamp;
-import com.unpad.trashcare.Warga;
 
 import java.util.Date;
 

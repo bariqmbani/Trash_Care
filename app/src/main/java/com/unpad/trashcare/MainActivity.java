@@ -40,6 +40,7 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 import com.unpad.trashcare.models.LokasiWarga;
+import com.unpad.trashcare.models.Warga;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -56,11 +57,10 @@ public class MainActivity extends AppCompatActivity
 
     private Button btnFeedback, btnArtikel, btnAngkutSampah;
     private ImageView imgLogout;
-    private TextView logout;
+    private TextView logout, tvNama, tvAlamat;
 
 
     String id;
-
     FirebaseFirestore db;
 
     private boolean mLocationPermissionGranted = false;
@@ -75,47 +75,17 @@ public class MainActivity extends AppCompatActivity
 
         checkMapServices();
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        db = FirebaseFirestore.getInstance();
+
 
         id = getIntent().getExtras().getString("ID");
-
-        Log.d(TAG,id);
-
-        checkMapServices();
-        db = FirebaseFirestore.getInstance();
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        tvNama = findViewById(R.id.tvNama);
+        tvAlamat = findViewById(R.id.tvAlamat);
+        displayWargaDetails();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-        btnFeedback = findViewById(R.id.btnFeedback);
-        btnFeedback.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, FeedbackActivity.class));
-            }
-        });
-
-        btnArtikel = findViewById(R.id.btnArtikel);
-        btnArtikel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, ArtikelActivity.class));
-            }
-        });
-
-        btnAngkutSampah = findViewById(R.id.btnAngkut);
-        btnAngkutSampah.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                /*Intent i = new Intent(MainActivity.this, MapActivity.class);
-                startActivity(i);*/
-                requestConfirmation();
-                Toast.makeText(MainActivity.this, "Tunggu", Toast.LENGTH_SHORT).show();
-                getUserDetails();
-
-            }
-        });
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -126,24 +96,61 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        btnFeedback = findViewById(R.id.btnFeedback);
+        btnFeedback.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, FeedbackActivity.class));
+            }
+        });
+        btnArtikel = findViewById(R.id.btnArtikel);
+        btnArtikel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, ArtikelActivity.class));
+            }
+        });
+        btnAngkutSampah = findViewById(R.id.btnAngkut);
+        btnAngkutSampah.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                /*Intent i = new Intent(MainActivity.this, MapActivity.class);
+                startActivity(i);*/
+                requestConfirmation();
+            }
+        });
         imgLogout = findViewById(R.id.imgLogout);
         logout = findViewById(R.id.logout);
-
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 logOut();
             }
         });
-
         imgLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 logOut();
             }
         });
+    }
 
-
+    private void displayWargaDetails() {
+        DocumentReference wargaRef = db.collection("warga").document(id);
+        wargaRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot doc = task.getResult();
+                    StringBuilder fieldNama = new StringBuilder();
+                    StringBuilder fieldAlamat = new StringBuilder();
+                    fieldNama.append(doc.get("nama"));
+                    fieldAlamat.append(doc.get("alamat"));
+                    tvNama.setText(fieldNama.toString());
+                    tvAlamat.setText(fieldAlamat.toString());
+                }
+            }
+        });
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -245,8 +252,9 @@ public class MainActivity extends AppCompatActivity
                 .setPositiveButton("Ya", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+                        Toast.makeText(MainActivity.this, "Tunggu", Toast.LENGTH_SHORT).show();
                         Warga warga = ((UserClient)(getApplicationContext())).getWarga();
-                        sendNotification(warga);
+                        angkutRequested(warga);
                         dialogInterface.dismiss();
                     }
                 })
@@ -258,6 +266,14 @@ public class MainActivity extends AppCompatActivity
                 });
         AlertDialog confirmAlert = builder.create();
         confirmAlert.show();
+    }
+
+    private void angkutRequested(Warga warga) {
+        getUserDetails();
+        warga.setRequest(true);
+        DocumentReference wargaRef = db.collection("warga").document(warga.getId_warga());
+        wargaRef.set(warga);
+        sendNotification(warga);
     }
 
 

@@ -2,6 +2,8 @@ package com.unpad.trashcare;
 
 import android.app.Application;
 
+import com.unpad.trashcare.models.Warga;
+
 
 public class UserClient extends Application {
 

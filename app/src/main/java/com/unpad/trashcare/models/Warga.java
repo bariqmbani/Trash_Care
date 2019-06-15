@@ -1,4 +1,4 @@
-package com.unpad.trashcare;
+package com.unpad.trashcare.models;
 
 public class Warga {
     private String alamat;
@@ -6,6 +6,7 @@ public class Warga {
     private String no_telp;
     private String password;
     private String id_warga;
+    private boolean request;
 
     public Warga() {
     }
@@ -48,5 +49,13 @@ public class Warga {
 
     public void setId_warga(String id_warga) {
         this.id_warga = id_warga;
+    }
+
+    public boolean isRequest() {
+        return request;
+    }
+
+    public void setRequest(boolean request) {
+        this.request = request;
     }
 }
