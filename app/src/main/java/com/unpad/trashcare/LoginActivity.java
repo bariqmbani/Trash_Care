@@ -115,7 +115,11 @@ public class LoginActivity extends AppCompatActivity {
                         userId.put("uid", mAuth.getInstance().getUid());
                         userId.put("id_warga", etUsername.getText().toString());
 
-                        db.collection("Token Warga").document(token).set(userId).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        db.collection("Token Warga")
+                                .document(etUsername.getText().toString())
+                                .collection("default")
+                                .document(token).set(userId)
+                                .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {

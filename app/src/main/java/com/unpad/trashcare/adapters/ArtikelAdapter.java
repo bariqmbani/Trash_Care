@@ -1,9 +1,10 @@
-package com.unpad.trashcare;
+package com.unpad.trashcare.adapters;
 
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.unpad.trashcare.Artikel;
+import com.unpad.trashcare.PageArtikel;
+import com.unpad.trashcare.R;
 
 import java.util.ArrayList;
 
@@ -65,7 +69,8 @@ public class ArtikelAdapter extends RecyclerView.Adapter<ArtikelAdapter.MyViewHo
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, PageArtikel.class);
-                intent.putExtra(Artikel.Art, dataSet.get(listPosition));
+                intent.putExtra("Judul Artikel", dataSet.get(listPosition).getJudul());
+                Log.d("ArtikelAdapter", "ini yang diklik " + dataSet.get(listPosition).getJudul());
                 context.startActivity(intent);
             }
         });
